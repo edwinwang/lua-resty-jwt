@@ -4,6 +4,7 @@ local aes = require "resty.aes"
 local evp = require "resty.evp"
 local hmac = require "resty.hmac"
 local resty_random = require "resty.random"
+local base64 = require "resty.base64"
 
 local _M = {_VERSION="0.1.11"}
 local mt = {__index=_M}
@@ -319,7 +320,7 @@ function _M.jwt_decode(self, b64_str, json_decode)
   if reminder > 0 then
     b64_str = b64_str .. string_rep(str_const.equal, 4 - reminder)
   end
-  local data = ngx_decode_base64(b64_str)
+  local data = base64.decode(b64_str)
   if not data then
     return nil
   end
@@ -563,7 +564,7 @@ local function extract_certificate(jwt_obj, x5u_content_retriever)
   if x5c ~= nil and x5c[1] ~= nil then
     -- TODO Might want to add support for intermediaries that we
     -- don't have in our trusted chain (items 2... if present)
-    local cert_str = ngx_decode_base64(x5c[1])
+    local cert_str = base64.decode(x5c[1])
     if not cert_str then
       jwt_obj[str_const.reason] = "Malformed x5c header"
     end
