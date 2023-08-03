@@ -329,7 +329,7 @@ end
     A function to set the system clock used for is_not_before and is_not_expired.  The
     default is to use ngx.now
 ]]--
-local system_clock = ngx.now
+local system_clock = os.time
 function _M.set_system_clock(clock)
   ensure_is_type(clock, "function", "clock must be a function")
   -- Check that clock returns the correct value
@@ -352,7 +352,7 @@ local function format_date_on_error(date_check_function, error_msg)
   return function(val, claim, jwt_json)
     local ret = date_check_function(val, claim, jwt_json)
     if ret == false then
-      error(string.format("'%s' claim %s %s", claim, error_msg, ngx.http_time(val)), 0)
+      error(string.format("'%s' claim %s %s", claim, error_msg, val), 0)
     end
     return true
   end
